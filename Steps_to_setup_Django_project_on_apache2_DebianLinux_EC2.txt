@@ -1,0 +1,112 @@
+Steps to setup Django project on apache2 running Linux( debian ) on EC2:
+0) First make sure you have installed  apache2, python3.11, mod_wsgi on Debian 12 (AWS EC2):
+
+sudo apt update, sudo apt upgrade, sudo apt install apache2, (and follow steps to install python) 
+
+
+
+1) admin@ip-172-31-32-82:~$ sudo apt install git
+   
+2) admin@ip-172-31-32-82:~$ git clone https://github.com/ash322ash422/django_simple_with_staticCSS_on_DebianApache2
+  
+ and then rename dir. "django_simple_with_staticCSS_on_DebianApache2" to "django_simple_proj"
+
+2.1) Now we setup virtual envir:
+
+a) admin@ip-172-31-32-82:~$ /usr/bin/python3 -m venv .venv/django_simple_proj
+
+b) admin@ip-172-31-32-82:~$ source .venv/django_simple_proj/bin/activate
+
+c) (django_simple_proj) admin@ip-172-31-32-82:~/django_simple_proj$ ~/.venv/django_simple_proj/bin/pip install -r requirements.txt
+
+d) Now goto aws.amazon.com and click on the EC2 instance -> 'security' tab -> click on 'launch-wizard-1' link -> Edit Inbound Rules -> add inbound rule: Type='Custom TCP' with port='8010' 
+   and source='0.0.0.0/0'. 
+   
+   Also make sure that under settings.py, ALLOWED_HOST=['your_ip_address'] or ['*']
+
+e) Now run : 'python manage.py runserver 0.0.0.0:8010'
+
+(django_simple_proj) admin@ip-172-31-32-82:~/django_simple_proj/mysite$ python3 manage.py runserver 0.0.0.0:8010
+
+Now if u goto URL 'ip_address:8010', you should see your website.
+
+3) Make changes to ports.conf:
+(django_simple_proj) admin@ip-172-31-32-82:~$ cat /etc/apache2/ports.conf
+# If you just change the port or add more ports here, you will likely also
+# have to change the VirtualHost statement in
+# /etc/apache2/sites-enabled/000-default.conf
+
+#Following was disabled b/c I am running radhesh web site on port 80
+#Listen 80
+Listen 89
+
+Listen 8000
+
+#Following is for django_simple_proj
+Listen 8010
+
+<IfModule ssl_module>
+        Listen 443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+        Listen 443
+</IfModule>
+(django_simple_proj) admin@ip-172-31-32-82:~$
+
+The original file:
+4) Create a new file:
+ (django_simple_proj) admin@ip-172-31-32-82:~$ cat /etc/apache2/sites-available/django_simple_proj.conf                                                   <VirtualHost *:8010>
+
+        #ServerAdmin webmaster@localhost
+        #DocumentRoot /var/www/html
+
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+        Alias /static /home/admin/django_simple_proj/mysite/mysite/static_root
+        <Directory /home/admin/django_simple_proj/mysite/mysite/static_root>
+                Require all granted
+        </Directory>
+
+
+        <Directory  /home/admin/django_simple_proj/mysite/mysite>
+        <Files wsgi.py>
+                Require all granted
+        </Files>
+        </Directory>
+
+        WSGIDaemonProcess mysite python-home=/home/admin/.venv/django_simple_proj python-path=/home/admin/django_simple_proj/mysite
+        WSGIProcessGroup mysite
+        WSGIScriptAlias / /home/admin/django_simple_proj/mysite/mysite/wsgi.py
+
+
+</VirtualHost>
+(django_simple_proj) admin@ip-172-31-32-82:~$
+
+5.1) Enable the site by creating a link:
+(django_simple_proj) admin@ip-172-31-32-82:/etc/apache2/sites-enabled$ sudo ln -s ../sites-available//django_simple_proj.conf
+(django_simple_proj) admin@ip-172-31-32-82:/etc/apache2/sites-enabled$ ll
+total 0
+lrwxrwxrwx 1 root root 35 Apr 26 14:28 000-default.conf -> ../sites-available/000-default.conf
+lrwxrwxrwx 1 root root 43 Apr 30 11:45 django_simple_proj.conf -> ../sites-available//django_simple_proj.conf
+(django_simple_proj) admin@ip-172-31-32-82:/etc/apache2/sites-enabled$
+
+5.2) admin@ip-172-31-32-82:~$ sudo apache2ctl configtest
+     
+     admin@ip-172-31-32-82:~$ sudo systemctl restart apache2
+
+     admin@ip-172-31-32-82:~$ sudo systemctl status apache2
+
+
+6) admin@ip-172-31-32-82:~$ chmod a+x -R django_simple_proj/
+   admin@ip-172-31-32-82:~$ chmod a+w -R django_simple_proj/
+
+7) Check apache2 configurations:
+   admin@ip-172-31-32-82:~$ sudo apache2ctl configtest
+
+8) admin@ip-172-31-32-82:~$ sudo systemctl restart apache2
+   admin@ip-172-31-32-82:~$ sudo systemctl status apache2
+
+9) Now goto URL "http://ip_adress:8010/" or "ip_adress:8010". Congratulations.
