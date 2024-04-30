@@ -1,0 +1,36 @@
+Steps to install mod_wsgi on Debian 12 running python3.11 on AWS EC2:
+0) First install python3.11, apache2, apt:
+sudo apt update, sudo apt upgrade, sudo apt install apache2, (and follow steps to install python) 
+
+1)
+admin@ip-172-31-32-82:~$ sudo apt install libapache2-mod-wsgi-py3
+
+2) create new file testing_wsgi.conf:
+admin@ip-172-31-32-82:~$ cat /etc/apache2/conf-available/testing_wsgi.conf
+# create new
+WSGIScriptAlias /test_wsgi /var/www/html/test_wsgi.py
+
+3) Enable testing_wsgi: 
+admin@ip-172-31-32-82:~$ sudo a2enconf testing_wsgi
+
+4)reload apache2:
+admin@ip-172-31-32-82:~$ sudo systemctl reload apache2
+
+5) create test_wsgi.py:
+admin@ip-172-31-32-82:~$ cat /var/www/html/test_wsgi.py
+# create new
+def application(environ, start_response):
+    status = '200 OK'
+    html = '<html>\n' \
+           '<body>\n' \
+           '<div style="width: 100%; font-size: 40px; font-weight: bold; text-align: center;">\n' \
+           'WSGI Test Page\n' \
+           '</div>\n' \
+           '</body>\n' \
+           '</html>\n'.encode("utf-8")
+    response_header = [('Content-type','text/html')]
+    start_response(status,response_header)
+    return [html]
+admin@ip-172-31-32-82:~$
+
+6) Now goto URL "server_ip_adrr/wsgi" and you would see "WSGI Test Page"
