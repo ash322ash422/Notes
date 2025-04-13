@@ -1,0 +1,35 @@
+steps
+1) On GitHub create new repo 'ai_projects'
+2) On local machine, in the directory 'ai_projects', type
+  - git init
+  - git remote add origin https://github.com/ash322ash422/ai_projects.git
+  - git add .
+  - git commit -m "Initial commit"
+  - git push -u origin master
+
+#####################
+1) I added *.mhtml in .gitignore:
+
+2) > git rm --cached *.mhtml
+The --cached option removes the files from the Git index but retains them in your working directory 
+
+3) > git commit -m "Exclude .mhtml files as per updated .gitignore"
+
+4) > git push origin master
+#####################
+issue: I had this big file DATASET.zip showing up on my local machine, although it did not existed. The solution:
+
+git filter-branch --force --index-filter "git rm --cached --ignore-unmatch computer_vision/Yoga_with_AI/DATASET.zip" --prune-empty --tag-name-filter cat -- --all
+
+#####################
+git rm -r --cached .
+git add .gitignore
+git commit -m "Update .gitignore and remove tracked files"
+
+######################
+I have a remote repo on github. I also have a local copy that repo on my local machine. I have updated the code on remote repo. How do I update my local copy from that remote repo ?
+...\tutorial\tut_python> git fetch origin
+...\tutorial\tut_python> git diff origin/master
+...\tutorial\tut_python> git merge origin/master
+#######################
+if performed "git add ." and did not do "git commit" command, then git add can be undone by "git reset"
