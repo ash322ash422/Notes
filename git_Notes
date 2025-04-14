@@ -31,5 +31,11 @@ I have a remote repo on github. I also have a local copy that repo on my local m
 ...\tutorial\tut_python> git fetch origin
 ...\tutorial\tut_python> git diff origin/master
 ...\tutorial\tut_python> git merge origin/master
+
+- or- 
+ 
+...\tutorial\tut_python> git fetch origin
+...\tutorial\tut_python> git diff --name-only HEAD origin/master
+...\tutorial\tut_python> git pull origin master
 #######################
 if performed "git add ." and did not do "git commit" command, then git add can be undone by "git reset"
