@@ -44,4 +44,4 @@ if performed "git add ." and did not do "git commit" command, then git add can b
 To check if your local Git repository is different from the remote repository, you can use the following Git commands:
 Step 1: Fetch changes from the remote:  git fetch
 Step 2: Check status against remote:    git status
- 
+Step 3: Update the local branch:        git pull 
